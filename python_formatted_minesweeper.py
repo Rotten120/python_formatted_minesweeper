@@ -20,7 +20,7 @@ class Cell:
         return self.is_flag
     
     def reveal(self):
-        if self.is_flag or self.is_fomb: return
+        if self.is_flag or self.is_bomb: return
         self.is_hidden = False
     
     def print(self):
@@ -50,9 +50,12 @@ class MineSweeper:
         self.bomb_count = bombs
         self.flag_count = self.bomb_count
         self.is_win = False
+
+        #c is current index for column
+        #r is current index for row
         self.board = [
-            [Cell() for i in range(col)]
-            for j in range(row)
+            [Cell() for c in range(col)]
+            for r in range(row)
             ]
         self.gen_bombs()
         
@@ -60,54 +63,56 @@ class MineSweeper:
         return self.board[row][col]
     
     def is_visible(self, vis):
-        for r in range(self.row):
-            for c in range(self.col):
-                self.get(c, r).is_hidden = vis
+        for row in range(self.row):
+            for col in range(self.col):
+                self.get(col, row).is_hidden = vis
     
     def count_hidden(self):
         count = 0
-        for r in range(self.row):
-            for c in range(self.col):
-                if self.get(c, r).is_hidden:
+        for row in range(self.row):
+            for col in range(self.col):
+                if self.get(col, row).is_hidden:
                     count += 1
         return count            
     
     def gen_bombs(self):
         grid_size = self.col * self.row
         bomb_placed = 0
-        for r in range(self.row):
-            for c in range(self.col):
-                grid_count = (self.col * r) + c
+        for row in range(self.row):
+            for col in range(self.col):
+                grid_count = (self.col * row) + col
                 base_chance = self.bomb_count / (10 * grid_size)
-                add_chance = (1 - base_chance) * (self.bomb_count - bomb_placed) / (gridSize - gridCount)
+                add_chance = (1 - base_chance) * (self.bomb_count - bomb_placed) / (grid_size - grid_count)
                 total_chance = int(100 * (base_chance + add_chance))
                 if random.randrange(100) < total_chance and bomb_placed < self.bomb_count:
-                    self.get(c, r).set_bomb()
+                    self.get(col, row).set_bomb()
                     bomb_placed += 1
-                    self.gen_numbers(c, r)
+                    self.gen_numbers(col, row)
                     
     def gen_numbers(self, col, row):
         rad = 1
-        r = [-rad,rad]
-        c = [-rad,rad]
+        row_delta = [-rad,rad]
+        col_delta = [-rad,rad]
         
-        if row + rad >= self.row: r[1] = self.row - row - 1
-        if row - rad < 0: r[0] = -row
-        if col + rad >= self.col: c[1] = self.col - col - 1
-        if col - rad < 0: c[0] = -col
-        
-        for i in range(row + r[0], row + r[1] + 1):
-            for j in range(col + c[0], col + c[1] + 1):
-                if not self.get(j, i).is_bomb:
-                    self.get(j, i).inc()
+        if row + rad >= self.row: row_delta[1] = self.row - row - 1
+        if row - rad < 0: row_delta[0] = -row
+        if col + rad >= self.col: col_delta[1] = self.col - col - 1
+        if col - rad < 0: col_delta[0] = -col
+
+        #c is current index for column
+        #r is current index for row
+        for c in range(row + row_delta[0], row + row_delta[1] + 1):
+            for r in range(col + col_delta[0], col + col_delta[1] + 1):
+                if not self.get(r, c).is_bomb:
+                    self.get(r, c).inc()
     
     def update(self):
         if self.menu == "Main Menu":
-            return self.mainMenu()
+            return self.main_menu()
         elif self.menu == "Game":
             self.game()
         elif self.menu == "Post Game":
-            self.postGame()    
+            self.post_game()    
         elif self.menu == "Controls":
             self.controls()
         elif self.menu == "Custom":
@@ -181,20 +186,20 @@ class MineSweeper:
         print()
         
         print('X', end = ' ')
-        for c in range(self.col):
-            print(chr(c + A_ascii), end = ' ')
+        for col in range(self.col):
+            print(chr(col + A_ascii), end = ' ')
         print('X', end = ' ')    
             
-        for r in range(self.row):
-            print('\n' + chr(r + A_ascii), end = ' ')    
-            for c in range(self.col):
-                self.get(c, r).print()
-            print(chr(r + A_ascii), end = ' ')  
+        for row in range(self.row):
+            print('\n' + chr(row + A_ascii), end = ' ')    
+            for col in range(self.col):
+                self.get(col, row).print()
+            print(chr(row + A_ascii), end = ' ')  
                 
         print()        
         print('X', end = ' ')
-        for c in range(self.col):
-            print(chr(c + A_ascii), end = ' ')
+        for col in range(self.col):
+            print(chr(col + A_ascii), end = ' ')
         print('X', end = ' ')    ;        
                 
         print('\n' + '_' * (2 * self.col + 3))
@@ -219,19 +224,21 @@ class MineSweeper:
         if self.get(col, row).val > 0: return
         
         rad = 1
-        r = [-rad,rad]
-        c = [-rad,rad]
+        row_delta = [-rad,rad]
+        col_delta = [-rad,rad]
         
-        if row + rad >= self.row: r[1] = self.row - row - 1
-        if row - rad < 0: r[0] = -row
-        if col + rad >= self.col: c[1] = self.col - col - 1
-        if col - rad < 0: c[0] = -col
-        
-        for i in range(row + r[0], row + r[1] + 1):
-            for j in range(col + c[0], col + c[1] + 1):
-                if not self.get(j, i).is_bomb and self.get(j, i).is_hidden:
-                    self.get(j, i).is_hidden = False
-                    self.clear_blank(j, i)
+        if row + rad >= self.row: row_delta[1] = self.row - row - 1
+        if row - rad < 0: row_delta[0] = -row
+        if col + rad >= self.col: col_delta[1] = self.col - col - 1
+        if col - rad < 0: col_delta[0] = -col
+
+        #c is current index for column
+        #r is current index for row
+        for c in range(row + row_delta[0], row + row_delta[1] + 1):
+            for r in range(col + col_delta[0], col + col_delta[1] + 1):
+                if not self.get(r, c).is_bomb and self.get(r, c).is_hidden:
+                    self.get(r, c).is_hidden = False
+                    self.clear_blank(r, c)
     
     def trigger_post_game(self, is_win):
         self.is_win = is_win
