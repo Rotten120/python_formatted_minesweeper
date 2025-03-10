@@ -1,33 +1,33 @@
 import random
 import os
 
-class cell:
+class Cell:
     def __init__(self):
         self.val = 0
-        self.isBomb = False
-        self.isFlag = False
-        self.ishidden = True
+        self.is_bomb = False
+        self.is_flag = False
+        self.is_hidden = True
     
     def inc(self):
         self.val += 1
     
-    def setBomb(self):
-        self.isBomb = True
+    def set_bomb(self):
+        self.is_bomb = True
         self.val = -1
     
-    def toggleFlag(self):
-        self.isFlag = not self.isFlag
-        return self.isFlag
+    def toggle_flag(self):
+        self.is_flag = not self.is_flag
+        return self.is_flag
     
     def reveal(self):
-        if self.isFlag or self.isBomb: return
-        self.ishidden = False
+        if self.is_flag or self.is_fomb: return
+        self.is_hidden = False
     
     def print(self):
         output = str(self.val)
-        if self.isFlag:     output = '>'
-        elif self.ishidden: output = '-'
-        elif self.isBomb:   output = '#'
+        if self.is_flag: output = '>'
+        elif self.is_hidden: output = '-'
+        elif self.is_bomb: output = '#'
         elif self.val == 0: output = ' '
         print(output, end = ' ')
 
