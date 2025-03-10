@@ -31,62 +31,62 @@ class Cell:
         elif self.val == 0: output = ' '
         print(output, end = ' ')
 
-class minesweeper:
+class MineSweeper:
     def __init__(self):
         self.col = 0
         self.row = 0
         self.mode = "Mine"
         self.menu = "Main Menu"
-        self.bombCount = 0
-        self.flagCount = 0
-        self.isWin = False
+        self.bomb_count = 0
+        self.flag_count = 0
+        self.is_win = False
         self.board = []
     
-    def genGame(self, col, row, bombs):
+    def gen_game(self, col, row, bombs):
         self.col = col
         self.row = row
         self.mode = "Mine"
         self.menu = "Game"
-        self.bombCount = bombs
-        self.flagCount = self.bombCount
-        self.isWin = False
+        self.bomb_count = bombs
+        self.flag_count = self.bomb_count
+        self.is_win = False
         self.board = [
-            [cell() for i in range(col)]
+            [Cell() for i in range(col)]
             for j in range(row)
             ]
-        self.genBombs()
+        self.gen_bombs()
         
     def get(self, col, row):
         return self.board[row][col]
     
-    def isVisible(self, vis):
+    def is_visible(self, vis):
         for r in range(self.row):
             for c in range(self.col):
-                self.get(c, r).ishidden = vis
+                self.get(c, r).is_hidden = vis
     
-    def countHidden(self):
+    def count_hidden(self):
         count = 0
         for r in range(self.row):
             for c in range(self.col):
-                if self.get(c, r).ishidden:
+                if self.get(c, r).is_hidden:
                     count += 1
         return count            
     
-    def genBombs(self):
-        gridSize = self.col * self.row
-        bombPlaced = 0
+    def gen_bombs(self):
+        grid_size = self.col * self.row
+        bomb_placed = 0
         for r in range(self.row):
             for c in range(self.col):
-                gridCount = (self.col * r) + c
-                baseChance = self.bombCount / (10 * gridSize)
-                addChance = (1 - baseChance) * (self.bombCount - bombPlaced) / (gridSize - gridCount)
-                totalChance = int(100 * (baseChance + addChance))
-                if random.randrange(100) < totalChance and bombPlaced < self.bombCount:
-                    self.get(c, r).setBomb()
-                    bombPlaced += 1
-                    self.genNumbers(c, r)
+                grid_count = (self.col * r) + c
+                base_chance = self.bomb_count / (10 * grid_size)
+                add_chance = (1 - base_chance) * (self.bomb_count - bomb_placed) / (gridSize - gridCount)
+                total_chance = int(100 * (base_chance + add_chance))
+                if random.randrange(100) < total_chance and bomb_placed < self.bomb_count:
+                    self.get(c, r).set_bomb()
+                    bomb_placed += 1
+                    self.gen_numbers(c, r)
                     
-    def genNumbers(self, col, row):
+    def gen_numbers(self, col, row):
         rad = 1
         r = [-rad,rad]
         c = [-rad,rad]
@@ -98,7 +98,7 @@ class minesweeper:
         
         for i in range(row + r[0], row + r[1] + 1):
             for j in range(col + c[0], col + c[1] + 1):
-                if not self.get(j, i).isBomb:
+                if not self.get(j, i).is_bomb:
                     self.get(j, i).inc()
     
     def update(self):
@@ -118,7 +118,7 @@ class minesweeper:
             self.easter1()
         return False    
             
-    def mainMenu(self):
+    def main_menu(self):
         print('_' * 27)
         print(' ' * 2, "M I N E S W E E P E R")  
         print()
@@ -138,9 +138,9 @@ class minesweeper:
         print('_' * 27)
         inp = input("\nInput: ")
         
-        if inp == '1': self.genGame(7, 7, 5)
-        if inp == '2': self.genGame(12, 12, 15)
-        if inp == '3': self.genGame(15, 15, 20)
+        if inp == '1': self.gen_game(7, 7, 5)
+        if inp == '2': self.gen_game(12, 12, 15)
+        if inp == '3': self.gen_game(15, 15, 20)
         if inp == '4': self.menu = "Custom"
         if inp == '5': self.menu = "Credits"
         if inp == "This deserves a 100": self.menu = "Easter1"
@@ -148,7 +148,7 @@ class minesweeper:
         return (inp == '6')
     
     def game(self):
-        self.printBoard()
+        self.print_board()
         print(
             "[1] Mode: Mine",
             "[2] Mode: Flag",
@@ -157,7 +157,7 @@ class minesweeper:
         sep = '\n')
         print('_' * (2 * self.col + 3))
         
-        Aascii = ord('A')
+        A_ascii = ord('A')
         inp = input('\nInput: ')
         
         if len(inp) == 1:
@@ -165,57 +165,57 @@ class minesweeper:
                 if int(inp) == 1: self.mode = "Mine"
                 if int(inp) == 2: self.mode = "Flag"
                 if int(inp) == 3: self.menu = "Controls"
-                if int(inp) == 4: self.triggerPostGame(False)
+                if int(inp) == 4: self.trigger_post_game(False)
             except: pass
             return
             
         for i in range((len(inp) + 1) // 3):
-            col = ord(inp[i * 3]) - Aascii
-            row = ord(inp[i * 3 + 1]) - Aascii 
+            col = ord(inp[i * 3]) - A_ascii
+            row = ord(inp[i * 3 + 1]) - A_ascii 
             if col < 0 or row < 0 or col >= self.col or row >= self.row:
                 continue
-            self.checkInput(col, row)
+            self.check_input(col, row)
                 
-    def printBoard(self):
-        Aascii= ord('A')
+    def print_board(self):
+        A_ascii= ord('A')
         print()
         
         print('X', end = ' ')
         for c in range(self.col):
-            print(chr(c + Aascii), end = ' ')
+            print(chr(c + A_ascii), end = ' ')
         print('X', end = ' ')    
             
         for r in range(self.row):
-            print('\n' + chr(r + Aascii), end = ' ')    
+            print('\n' + chr(r + A_ascii), end = ' ')    
             for c in range(self.col):
                 self.get(c, r).print()
-            print(chr(r + Aascii), end = ' ')  
+            print(chr(r + A_ascii), end = ' ')  
                 
         print()        
         print('X', end = ' ')
         for c in range(self.col):
-            print(chr(c + Aascii), end = ' ')
+            print(chr(c + A_ascii), end = ' ')
         print('X', end = ' ')    ;        
                 
         print('\n' + '_' * (2 * self.col + 3))
-        print(' ' * (self.col - 9), "Flags:", self.flagCount, "Mode:", self.mode, '\n')                     
+        print(' ' * (self.col - 9), "Flags:", self.flag_count, "Mode:", self.mode, '\n')                     
                 
-    def checkInput(self, col, row):
+    def check_input(self, col, row):
         if self.mode == "Flag":
-            if self.get(col, row).toggleFlag(): self.flagCount -= 1
-            else: self.flagCount += 1
+            if self.get(col, row).toggle_flag(): self.flag_count -= 1
+            else: self.flag_count += 1
             return
         
         self.get(col, row).reveal()
         
-        if self.get(col, row).isBomb and not self.get(col, row).isFlag:
-            self.triggerPostGame(False)
-        elif self.countHidden() == self.bombCount:
-            self.triggerPostGame(True)
+        if self.get(col, row).is_bomb and not self.get(col, row).is_flag:
+            self.trigger_post_game(False)
+        elif self.count_hidden() == self.bomb_count:
+            self.trigger_post_game(True)
         elif self.get(col, row).val == 0:
-            self.clearBlank(col, row)
+            self.clear_blank(col, row)
     
-    def clearBlank(self, col, row):
+    def clear_blank(self, col, row):
         if self.get(col, row).val > 0: return
         
         rad = 1
@@ -229,19 +229,19 @@ class minesweeper:
         
         for i in range(row + r[0], row + r[1] + 1):
             for j in range(col + c[0], col + c[1] + 1):
-                if not self.get(j, i).isBomb and self.get(j, i).ishidden:
-                    self.get(j, i).ishidden = False
-                    self.clearBlank(j, i)
+                if not self.get(j, i).is_bomb and self.get(j, i).is_hidden:
+                    self.get(j, i).is_hidden = False
+                    self.clear_blank(j, i)
     
-    def triggerPostGame(self, isWin):
-        self.isWin = isWin
+    def trigger_post_game(self, is_win):
+        self.is_win = is_win
         self.menu = "Post Game"
     
-    def postGame(self):
-        if not self.isWin:
-            self.isVisible(False)
-        self.printBoard()
-        if self.isWin:
+    def post_game(self):
+        if not self.is_win:
+            self.is_visible(False)
+        self.print_board()
+        if self.is_win:
             print('\n' + ' ' * (self.col - 6), "Y O U  W I N")
         else:
             print('\n' + ' ' * (self.col - 7), "Y O U  L O S E")
@@ -252,7 +252,7 @@ class minesweeper:
         inp = input("\nInput: ")
         
         if inp == '1':
-            self.genGame(self.col, self.row, self.bombCount)
+            self.gen_game(self.col, self.row, self.bomb_count)
             self.menu = "Game"
         if inp == '2':
             self.menu = "Main Menu"    
@@ -278,21 +278,21 @@ class minesweeper:
         while True:
             try:
                 print('_' * 27)
-                colInp = int(input("How many columns: "))
-                rowInp = int(input("How many rows: "))
-                bombInp = int(input("How many bombs: "))
+                col_inp = int(input("How many columns: "))
+                row_inp = int(input("How many rows: "))
+                bomb_inp = int(input("How many bombs: "))
             except: continue    
             print()
-            if colInp == -1 or rowInp == -1 or bombInp == -1:
+            if col_inp == -1 or row_inp == -1 or bomb_inp == -1:
                 self.menu = "Main Menu"
                 return
                 
-            if colInp < 5 or rowInp < 5: print("Column/Row too small")
-            elif colInp > 26 or rowInp > 26: print("Column/Row too large")
-            elif bombInp < 1: print("Game must have at least 1 bomb")
-            elif bombInp >= colInp * rowInp: print("Too many bombs")
+            if col_inp < 5 or row_inp < 5: print("Column/Row too small")
+            elif col_inp > 26 or row_inp > 26: print("Column/Row too large")
+            elif bomb_inp < 1: print("Game must have at least 1 bomb")
+            elif bomb_inp >= col_inp * rowInp: print("Too many bombs")
             else: break
-        self.genGame(colInp, rowInp, bombInp)
+        self.gen_game(col_inp, row_inp, bomb_inp)
         self.menu = "Game"
     
     def credits(self):
@@ -360,7 +360,7 @@ class minesweeper:
         if inp == '1': self.menu = "Main Menu"
 
 if __name__ == '__main__':
-    game = minesweeper()
+    game = MineSweeper()
     while True:
         os.system('cls')
         if game.update(): break
